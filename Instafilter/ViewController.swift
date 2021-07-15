@@ -13,6 +13,7 @@ final class ViewController: UIViewController {
 	// MARK: - Outlets
 	@IBOutlet var imageView: UIImageView!
 	@IBOutlet var intensity: UISlider!
+	@IBOutlet var changeFilterButton: UIButton!
 
 	// MARK: - Properties
 	private var currentImage: UIImage!
@@ -52,6 +53,8 @@ final class ViewController: UIViewController {
 		let beginImage = CIImage(image: currentImage)
 		currentFilter.setValue(beginImage, forKey: kCIInputImageKey)
 
+		changeFilterButton.setTitle("Filter: \(actionTitle)", for: .normal)
+
 		applyProcessing()
 	}
 
@@ -61,16 +64,7 @@ final class ViewController: UIViewController {
 	}
 
 	@IBAction func changeFilter(_ sender: Any) {
-		let alertController = UIAlertController(title: "Choose filter", message: nil, preferredStyle: .actionSheet)
-		alertController.addAction(UIAlertAction(title: "CIBumpDistortion", style: .default, handler: setFilter))
-		alertController.addAction(UIAlertAction(title: "CIGaussianBlur", style: .default, handler: setFilter))
-		alertController.addAction(UIAlertAction(title: "CIPixellate", style: .default, handler: setFilter))
-		alertController.addAction(UIAlertAction(title: "CISepiaTone", style: .default, handler: setFilter))
-		alertController.addAction(UIAlertAction(title: "CITwirlDistortion", style: .default, handler: setFilter))
-		alertController.addAction(UIAlertAction(title: "CIUnsharpMask", style: .default, handler: setFilter))
-		alertController.addAction(UIAlertAction(title: "CIVignette", style: .default, handler: setFilter))
-		alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-		present(alertController, animated: UIView.areAnimationsEnabled)
+		showSelectFiltersAlert()
 	}
 
 	@IBAction func save(_ sender: Any) {
@@ -88,21 +82,44 @@ final class ViewController: UIViewController {
 		present(picker, animated: UIView.areAnimationsEnabled)
 	}
 
-	@objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+	@objc private func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
 		if let error = error {
-			let alertController = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
-			alertController.addAction(UIAlertAction(title: "OK", style: .default))
-			present(alertController, animated: UIView.areAnimationsEnabled)
+			showSaveErrorAlert(error: error)
 		} else {
-			let alertController = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .alert)
-			alertController.addAction(UIAlertAction(title: "OK", style: .default))
-			present(alertController, animated: UIView.areAnimationsEnabled)
+			showSavedSuccessfulAlert()
 		}
 	}
 
 	// MARK: - Alerts
 	private func showNoImageAlert() {
-		
+		let alertController = UIAlertController(title: "Save error", message: "There is no image to save", preferredStyle: .alert)
+		alertController.addAction(UIAlertAction(title: "OK", style: .default))
+		present(alertController, animated: UIView.areAnimationsEnabled)
+	}
+
+	private func showSelectFiltersAlert() {
+		let alertController = UIAlertController(title: "Choose filter", message: nil, preferredStyle: .actionSheet)
+		alertController.addAction(UIAlertAction(title: "CIBumpDistortion", style: .default, handler: setFilter))
+		alertController.addAction(UIAlertAction(title: "CIGaussianBlur", style: .default, handler: setFilter))
+		alertController.addAction(UIAlertAction(title: "CIPixellate", style: .default, handler: setFilter))
+		alertController.addAction(UIAlertAction(title: "CISepiaTone", style: .default, handler: setFilter))
+		alertController.addAction(UIAlertAction(title: "CITwirlDistortion", style: .default, handler: setFilter))
+		alertController.addAction(UIAlertAction(title: "CIUnsharpMask", style: .default, handler: setFilter))
+		alertController.addAction(UIAlertAction(title: "CIVignette", style: .default, handler: setFilter))
+		alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+		present(alertController, animated: UIView.areAnimationsEnabled)
+	}
+
+	private func showSaveErrorAlert(error: Error) {
+		let alertController = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
+		alertController.addAction(UIAlertAction(title: "OK", style: .default))
+		present(alertController, animated: UIView.areAnimationsEnabled)
+	}
+
+	private func showSavedSuccessfulAlert() {
+		let alertController = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .alert)
+		alertController.addAction(UIAlertAction(title: "OK", style: .default))
+		present(alertController, animated: UIView.areAnimationsEnabled)
 	}
 }
 
