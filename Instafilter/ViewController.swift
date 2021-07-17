@@ -130,11 +130,19 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
 							   didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
 		guard let image = info[.editedImage] as? UIImage else { return }
 		dismiss(animated: UIView.areAnimationsEnabled)
-		currentImage = image
+		UIView.animate(withDuration: 0.5) {
+			self.imageView.alpha = 0
+		} completion: { _ in
+			UIView.animate(withDuration: 0.5) {
+				self.imageView.alpha = 1
+			} completion: { _ in
+				self.currentImage = image
 
-		let beginImage = CIImage(image: currentImage)
-		currentFilter.setValue(beginImage, forKey: kCIInputImageKey)
+				let beginImage = CIImage(image: self.currentImage)
+				self.currentFilter.setValue(beginImage, forKey: kCIInputImageKey)
 
-		applyProcessing()
+				self.applyProcessing()
+			}
+		}
 	}
 }
